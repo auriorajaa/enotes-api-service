@@ -15,6 +15,7 @@ import com.example.enotes.entity.Category;
 import com.example.enotes.exception.ResourceNotFoundException;
 import com.example.enotes.repository.CategoryRepository;
 import com.example.enotes.service.CategoryService;
+import com.example.enotes.util.Validation;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -25,13 +26,13 @@ public class CategoryServiceImpl implements CategoryService {
 	@Autowired
 	private ModelMapper mapper;
 
+	@Autowired
+	private Validation validation;
+
 	@Override
 	public Boolean saveCategory(CategoryDto categoryDto) {
 
-		// Category category = new Category();
-		// category.setName(categoryDto.getName());
-		// category.setDescription(categoryDto.getDescription());
-		// category.setIsActive(categoryDto.getIsActive());
+		validation.categoryValidation(categoryDto);
 
 		Category category = mapper.map(categoryDto, Category.class);
 
