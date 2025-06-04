@@ -4,6 +4,10 @@ import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
@@ -13,20 +17,23 @@ import lombok.Setter;
 @Getter
 @Setter
 @MappedSuperclass
-public class BaseModel {
-  private Boolean isActive;
+public abstract class BaseModel {
 
-  private Boolean isDeleted;
+	@CreatedBy
+	@Column(updatable = false)
+	private Integer createdBy;
 
-  private Integer createdBy;
+	@CreationTimestamp
+	@Column(name = "created_on", updatable = false)
+	@CreatedDate
+	private Date createdOn;
 
-  @CreationTimestamp
-  @Column(name = "created_on", updatable = false)
-  private Date createdOn;
+	@LastModifiedBy
+	@Column(insertable = false)
+	private Integer updatedBy;
 
-  private Integer updatedBy;
-
-  @UpdateTimestamp
-  @Column(name = "updated_on")
-  private Date updatedOn;
+	@UpdateTimestamp
+	@Column(name = "updated_on", insertable = false)
+	@LastModifiedDate
+	private Date updatedOn;
 }
