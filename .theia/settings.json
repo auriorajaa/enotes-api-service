@@ -1,7 +1,0 @@
-{
-    "java.compile.nullAnalysis.mode": "automatic",
-    "java.debug.settings.forceBuildBeforeLaunch": false,
-    "java.debug.settings.console": "internalConsole",
-    "java.configuration.updateBuildConfiguration": "automatic",
-    "editor.wordWrap": "on"
-}

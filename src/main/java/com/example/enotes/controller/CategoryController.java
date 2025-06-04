@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.enotes.dto.CategoryDto;
 import com.example.enotes.dto.CategoryResponse;
 import com.example.enotes.service.CategoryService;
+import com.example.enotes.util.CommonUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,35 +32,38 @@ public class CategoryController {
 
 	@PostMapping("/save")
 	public ResponseEntity<?> saveCategory(@RequestBody CategoryDto categoryDto) {
+
 		Boolean saveCategory = categoryService.saveCategory(categoryDto);
 
 		if (saveCategory) {
-			return new ResponseEntity<>("Category successfully saved!", HttpStatus.CREATED);
+			return CommonUtil.createBuildResponseMessage("Category successfully saved.", HttpStatus.CREATED);
 		} else {
-			return new ResponseEntity<>("Something went wrong when saving category. Failed to save!",
+			return CommonUtil.createErrorResponseMessage("Something went wrong when saving category. Failed to save.",
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@GetMapping("/")
 	public ResponseEntity<?> getAllCategory() {
+
 		List<CategoryDto> allCategory = categoryService.getAllCategory();
 
 		if (CollectionUtils.isEmpty(allCategory)) {
 			return ResponseEntity.noContent().build();
 		} else {
-			return new ResponseEntity<>(allCategory, HttpStatus.OK);
+			return CommonUtil.createBuildResponse(allCategory, HttpStatus.OK);
 		}
 	}
 
 	@GetMapping("/active")
 	public ResponseEntity<?> getActiveCategory() {
+
 		List<CategoryResponse> allCategory = categoryService.getActiveCategory();
 
 		if (CollectionUtils.isEmpty(allCategory)) {
 			return ResponseEntity.noContent().build();
 		} else {
-			return new ResponseEntity<>(allCategory, HttpStatus.OK);
+			return CommonUtil.createBuildResponse(allCategory, HttpStatus.OK);
 		}
 	}
 
@@ -69,10 +73,10 @@ public class CategoryController {
 		CategoryDto categoryDto = categoryService.getCategoryById(id);
 
 		if (ObjectUtils.isEmpty(categoryDto)) {
-			return new ResponseEntity<>("Category not found with ID: " + id, HttpStatus.NOT_FOUND);
+			return CommonUtil.createErrorResponseMessage("Category not found with ID: " + id, HttpStatus.NOT_FOUND);
 		}
 
-		return new ResponseEntity<>(categoryDto, HttpStatus.OK);
+		return CommonUtil.createBuildResponse(categoryDto, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
@@ -81,10 +85,10 @@ public class CategoryController {
 		Boolean deleted = categoryService.deleteCategory(id);
 
 		if (deleted) {
-			return new ResponseEntity<>("Successfully deleting category!", HttpStatus.OK);
+			return CommonUtil.createBuildResponseMessage("Successfully deleting category.", HttpStatus.OK);
 		}
 
-		return new ResponseEntity<>("Something went wrong. Failed to delete category!",
+		return CommonUtil.createErrorResponseMessage("Something went wrong. Failed to delete category.",
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
