@@ -6,15 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.enotes.dto.NotesDto;
 import com.example.enotes.service.NotesService;
 import com.example.enotes.util.CommonUtil;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/notes")
@@ -24,11 +21,11 @@ public class NotesController {
   private NotesService notesService;
 
   @PostMapping("/")
-  public ResponseEntity<?> saveNotes(@RequestBody NotesDto notesDto) throws Exception {
-    Boolean saveNotes = notesService.saveNotes(notesDto);
+  public ResponseEntity<?> saveNotes(@RequestParam String notes, @RequestParam(required = false) MultipartFile file) throws Exception {
+    Boolean saveNotes = notesService.saveNotes(notes, file);
 
     if (saveNotes) {
-      return CommonUtil.createBuildResponse("Notes successfully created.", HttpStatus.CREATED);
+      return CommonUtil.createBuildResponseMessage("Notes successfully created.", HttpStatus.CREATED);
     }
 
     return CommonUtil.createErrorResponseMessage("Notes failed to create.", HttpStatus.INTERNAL_SERVER_ERROR);
