@@ -10,6 +10,8 @@ import com.example.enotes.util.CommonUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.FileNotFoundException;
+
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -50,4 +52,8 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 	}
 
+	@ExceptionHandler(FileNotFoundException.class)
+	public ResponseEntity<?> handleFileNotFoundException(FileNotFoundException e) {
+		return CommonUtil.createErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+	}
 }
