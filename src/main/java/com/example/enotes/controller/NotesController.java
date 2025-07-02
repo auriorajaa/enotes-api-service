@@ -2,6 +2,7 @@ package com.example.enotes.controller;
 
 import java.util.List;
 
+import com.example.enotes.dto.NotesResponse;
 import com.example.enotes.entity.FileDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -48,6 +49,7 @@ public class NotesController {
     return ResponseEntity.ok().headers(headers).body(data);
   }
 
+
   @GetMapping("/")
   public ResponseEntity<?> getAllNotes() {
     List<NotesDto> notes = notesService.getAllNotes();
@@ -59,4 +61,16 @@ public class NotesController {
     return CommonUtil.createBuildResponse(notes, HttpStatus.OK);
   }
 
+  @GetMapping("/user-notes")
+  public ResponseEntity<?> getAllNotesByUser(@RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+                                             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+    Integer userId = 2;
+    NotesResponse notes = notesService.getAllNotesByUser(userId, pageNo, pageSize);
+
+//    if (CollectionUtils.isEmpty(notes)) {
+//      return ResponseEntity.noContent().build();
+//    }
+
+    return CommonUtil.createBuildResponse(notes, HttpStatus.OK);
+  }
 }
