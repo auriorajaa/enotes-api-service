@@ -11,4 +11,8 @@ import java.util.List;
 public interface NotesRepository extends JpaRepository<Notes, Integer>{
 
     Page<Notes> findByCreatedBy(Integer userId, Pageable pageable);
+
+    List<Notes> findByCreatedByAndIsDeletedTrue(Integer userId);
+
+    Page<Notes> findByCreatedByAndIsDeletedFalse(Integer userId, Pageable pageable);
 }
