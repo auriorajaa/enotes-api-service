@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.enotes.entity.Notes;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface NotesRepository extends JpaRepository<Notes, Integer>{
@@ -15,4 +16,6 @@ public interface NotesRepository extends JpaRepository<Notes, Integer>{
     List<Notes> findByCreatedByAndIsDeletedTrue(Integer userId);
 
     Page<Notes> findByCreatedByAndIsDeletedFalse(Integer userId, Pageable pageable);
+
+    List<Notes> findAllByIsDeletedAndDeletedOnBefore(boolean b, LocalDateTime cutOffDate);
 }
