@@ -2,6 +2,7 @@ package com.example.enotes.controller;
 
 import java.util.List;
 
+import com.example.enotes.dto.FavoriteNotesDto;
 import com.example.enotes.dto.NotesResponse;
 import com.example.enotes.entity.FileDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,5 +121,31 @@ public class NotesController {
     notesService.emptyRecycleBin(userId);
 
     return CommonUtil.createBuildResponseMessage("Recycle bin successfully emptied.", HttpStatus.OK);
+  }
+
+  @GetMapping("/favorite/{notesId}")
+  public ResponseEntity<?> favoriteNotes(@PathVariable Integer notesId) throws Exception {
+    notesService.favoriteNotes(notesId);
+
+    return CommonUtil.createBuildResponseMessage("Notes successfully added to favorite.", HttpStatus.CREATED);
+  }
+
+  @DeleteMapping("/un-favorite/{favoriteNotesId}")
+  public ResponseEntity<?> unFavoriteNotes(@PathVariable Integer favoriteNotesId) throws Exception {
+    notesService.unFavoriteNotes(favoriteNotesId);
+
+    return CommonUtil.createBuildResponseMessage("Notes successfully removed from favorite.", HttpStatus.OK);
+  }
+
+  @GetMapping("/favorite-notes")
+  public ResponseEntity<?> getUserFavoriteNotes() throws Exception {
+    List<FavoriteNotesDto> userFavoriteNotes = notesService.getUserFavoriteNotes();
+
+    if (CollectionUtils.isEmpty(userFavoriteNotes)) {
+      return ResponseEntity.noContent().build();
+    }
+
+    return CommonUtil.createBuildResponse(userFavoriteNotes,HttpStatus.OK);
+
   }
 }

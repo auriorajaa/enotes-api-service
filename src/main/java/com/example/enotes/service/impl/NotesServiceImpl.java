@@ -13,8 +13,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.example.enotes.dto.FavoriteNotesDto;
 import com.example.enotes.dto.NotesResponse;
+import com.example.enotes.entity.FavoriteNotes;
 import com.example.enotes.entity.FileDetails;
+import com.example.enotes.repository.FavoriteNotesRepository;
 import com.example.enotes.repository.FileRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FilenameUtils;
@@ -52,6 +55,9 @@ public class NotesServiceImpl implements NotesService {
 
   @Autowired
   private FileRepository fileRepo;
+
+  @Autowired
+  private FavoriteNotesRepository favoriteNotesRepo;
 
   @Value("${file.upload.path}")
   private String uploadPath;
@@ -255,6 +261,38 @@ public class NotesServiceImpl implements NotesService {
     if (!CollectionUtils.isEmpty(recycleNotes)) {
       notesRepo.deleteAll(recycleNotes);
     }
+  }
+
+  @Override
+  public void favoriteNotes(Integer notesId) throws Exception{
+    int userId = 2;
+
+    Notes notes = notesRepo.findById(notesId)
+            .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
+
+    FavoriteNotes favoriteNotes = FavoriteNotes.builder()
+            .notes(notes)
+            .userId(userId)
+            .build();
+
+    favoriteNotesRepo.save(favoriteNotes);
+  }
+
+  @Override
+  public void unFavoriteNotes(Integer favoriteNotesId) throws Exception{
+    FavoriteNotes favoriteNotes = favoriteNotesRepo.findById(favoriteNotesId)
+            .orElseThrow(() -> new ResourceNotFoundException("Favorite notes not found"));
+
+    favoriteNotesRepo.delete(favoriteNotes);
+  }
+
+  @Override
+  public List<FavoriteNotesDto> getUserFavoriteNotes() throws Exception {
+    int userId = 2;
+
+    List<FavoriteNotes> favoriteNotes = favoriteNotesRepo.findByUserId(userId);
+
+    return favoriteNotes.stream().map(favNotes -> mapper.map(favNotes, FavoriteNotesDto.class)).toList();
   }
 
 }

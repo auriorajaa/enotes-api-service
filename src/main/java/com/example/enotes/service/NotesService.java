@@ -2,6 +2,7 @@ package com.example.enotes.service;
 
 import java.util.List;
 
+import com.example.enotes.dto.FavoriteNotesDto;
 import com.example.enotes.dto.NotesDto;
 import com.example.enotes.dto.NotesResponse;
 import com.example.enotes.entity.FileDetails;
@@ -28,4 +29,10 @@ public interface NotesService {
   public void hardDeleteNotes(Integer id) throws Exception;
 
   public void emptyRecycleBin(int userId);
+
+  public void favoriteNotes(Integer notesId) throws Exception;
+
+  public void unFavoriteNotes(Integer favoriteNotesId) throws Exception;
+
+  public List<FavoriteNotesDto> getUserFavoriteNotes() throws Exception;
 }
