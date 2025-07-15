@@ -3,6 +3,9 @@ package com.example.enotes.util;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.example.enotes.dto.TodoDto;
+import com.example.enotes.enums.TodoStatus;
+import com.example.enotes.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -52,6 +55,22 @@ public class Validation {
 			throw new ValidationException(error);
 		}
 
+	}
+
+	public void todoValidation(TodoDto todo) throws Exception{
+		TodoDto.StatusDto reqStatus = todo.getStatus();
+
+		Boolean statusFound = false;
+
+		for (TodoStatus st : TodoStatus.values()) {
+			if (st.getId().equals(reqStatus.getId())) {
+				statusFound = true;
+			}
+		}
+
+		if (!statusFound) {
+			throw new ResourceNotFoundException("Invalid status");
+		}
 	}
 
 }
