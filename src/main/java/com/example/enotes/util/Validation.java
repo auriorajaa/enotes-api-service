@@ -1,19 +1,28 @@
 package com.example.enotes.util;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.example.enotes.dto.TodoDto;
+import com.example.enotes.dto.UserDto;
 import com.example.enotes.enums.TodoStatus;
 import com.example.enotes.exception.ResourceNotFoundException;
+import com.example.enotes.repository.RoleRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import com.example.enotes.dto.CategoryDto;
 import com.example.enotes.exception.ValidationException;
+import org.springframework.util.StringUtils;
 
 @Component
 public class Validation {
+
+	@Autowired
+	private RoleRepository roleRepo;
 
 	public void categoryValidation(CategoryDto categoryDto) {
 
@@ -73,4 +82,49 @@ public class Validation {
 		}
 	}
 
+	public void userValidation(UserDto userDto) {
+		if (!StringUtils.hasText(userDto.getFirstName())) {
+			throw new IllegalArgumentException("First name must not be blank.");
+		}
+
+		if (!StringUtils.hasText(userDto.getLastName())) {
+			throw new IllegalArgumentException("Last name must not be blank.");
+		}
+
+		if (!StringUtils.hasText(userDto.getEmail()) ||
+				!userDto.getEmail().matches(Constants.EMAIL_REGEX)) {
+			throw new IllegalArgumentException("Invalid email address");
+		}
+
+		if (!StringUtils.hasText(userDto.getPassword()) ||
+				!userDto.getPassword().matches(Constants.PASSWORD_REGEX)) {
+			throw new IllegalArgumentException("Password must be at least 8 characters and include uppercase, lowercase, number, and special character.");
+		}
+
+		if (!StringUtils.hasText(userDto.getMobNo()) ||
+				!userDto.getMobNo().matches(Constants.MOB_NO_REGEX)) {
+			throw new IllegalArgumentException("Invalid mobile number. Format must include country code. Example: +14155552671 (US).");
+		}
+
+		if (CollectionUtils.isEmpty(userDto.getRoles())) {
+			throw new IllegalArgumentException("Roles must not be blank.");
+		} else {
+			List<Integer> roleIds = roleRepo
+					.findAll()
+					.stream()
+					.map(r -> r.getId())
+					.toList();
+
+			List<Integer> invalidReqRoleIds = userDto
+					.getRoles()
+					.stream()
+					.map(r -> r.getId())
+					.filter(roleId -> !roleIds.contains(roleId))
+					.toList();
+
+			if (!CollectionUtils.isEmpty(invalidReqRoleIds)) {
+				throw new IllegalArgumentException("Invalid role ids: " + invalidReqRoleIds);
+			}
+		}
+	}
 }
