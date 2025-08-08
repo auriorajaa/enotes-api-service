@@ -7,8 +7,10 @@ import java.util.Map;
 import com.example.enotes.dto.TodoDto;
 import com.example.enotes.dto.UserDto;
 import com.example.enotes.enums.TodoStatus;
+import com.example.enotes.exception.ExistDataException;
 import com.example.enotes.exception.ResourceNotFoundException;
 import com.example.enotes.repository.RoleRepository;
+import com.example.enotes.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -23,6 +25,9 @@ public class Validation {
 
 	@Autowired
 	private RoleRepository roleRepo;
+
+	@Autowired
+	private UserRepository userRepo;
 
 	public void categoryValidation(CategoryDto categoryDto) {
 
@@ -94,6 +99,13 @@ public class Validation {
 		if (!StringUtils.hasText(userDto.getEmail()) ||
 				!userDto.getEmail().matches(Constants.EMAIL_REGEX)) {
 			throw new IllegalArgumentException("Invalid email address");
+		} else {
+			// Validate email already exist
+			Boolean existEmail = userRepo.existsByEmail(userDto.getEmail());
+
+			if (existEmail) {
+				throw new ExistDataException("Email already exist");
+			}
 		}
 
 		if (!StringUtils.hasText(userDto.getPassword()) ||
