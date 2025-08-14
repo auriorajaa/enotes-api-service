@@ -2,6 +2,7 @@ package com.example.enotes.service.impl;
 
 import com.example.enotes.dto.EmailRequest;
 import com.example.enotes.dto.UserDto;
+import com.example.enotes.entity.AccountStatus;
 import com.example.enotes.entity.Role;
 import com.example.enotes.entity.User;
 import com.example.enotes.repository.RoleRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -34,12 +36,18 @@ public class UserServiceImpl implements UserService {
     private EmailServiceImpl emailServiceImpl;
 
     @Override
-    public Boolean register(UserDto userDto) throws Exception{
+    public Boolean register(UserDto userDto, String url) throws Exception{
         validation.userValidation(userDto);
 
         User user = mapper.map(userDto, User.class);
 
         setRole(userDto, user);
+
+        AccountStatus status = AccountStatus.builder()
+                .isActive(false)
+                .verificationCode(UUID.randomUUID().toString())
+                .build();
+        user.setStatus(status);
 
         User saveUser = userRepo.save(user);
 
@@ -48,18 +56,29 @@ public class UserServiceImpl implements UserService {
         }
 
         // Send email
-        emailSend(saveUser);
+        emailSend(saveUser, url);
 
         return true;
     }
 
-    private void emailSend(User saveUser) throws Exception {
-        String message = "Dear " + saveUser.getFirstName() + ","
-                + "<br><br>Thank you for registering with Enotes. Your account has been successfully created."
+    private void emailSend(User saveUser, String url) throws Exception {
+        String message = ""
+                + "Dear [[username]],"
+                + "<br><br>Thank you for registering with Enotes. "
+                + "Your account has been successfully created."
                 + "<br><br>You can now log in to your account by clicking the link below:"
-                + "<br><a href=\"#\">Click here to Login</a>"
+                + "<br><a href=\"[[url]]\">Click here to Login</a>"
                 + "<br><br>If you have any questions, please do not hesitate to contact our support team."
                 + "<br><br>Best regards,<br>The Enotes Team";
+
+        message = message.replace("[[username]]", saveUser.getFirstName());
+        message = message.replace(
+                "[[url]]",
+                url + "/api/v1/home/verify?uid="
+                        + saveUser.getId()
+                        + "&code="
+                        + saveUser.getStatus().getVerificationCode()
+        );
 
         EmailRequest emailRequest = EmailRequest.builder()
                 .to(saveUser.getEmail())

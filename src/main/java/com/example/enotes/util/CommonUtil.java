@@ -1,5 +1,6 @@
 package com.example.enotes.util;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -79,4 +80,12 @@ public class CommonUtil {
     }
 
   }
+
+    public static String getUrl(HttpServletRequest request) {
+      String apiUrl = request.getRequestURL().toString();
+      // String url = request.getServletPath();
+      apiUrl = apiUrl.replace(request.getServletPath(), "");
+
+      return apiUrl;
+    }
 }
