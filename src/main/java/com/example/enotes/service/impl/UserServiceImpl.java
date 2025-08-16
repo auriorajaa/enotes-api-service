@@ -1,6 +1,9 @@
 package com.example.enotes.service.impl;
 
+import com.example.enotes.config.security.CustomUserDetails;
 import com.example.enotes.dto.EmailRequest;
+import com.example.enotes.dto.LoginRequest;
+import com.example.enotes.dto.LoginResponse;
 import com.example.enotes.dto.UserDto;
 import com.example.enotes.entity.AccountStatus;
 import com.example.enotes.entity.Role;
@@ -11,6 +14,10 @@ import com.example.enotes.service.UserService;
 import com.example.enotes.util.Validation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -35,6 +42,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private EmailServiceImpl emailServiceImpl;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
     @Override
     public Boolean register(UserDto userDto, String url) throws Exception{
         validation.userValidation(userDto);
@@ -48,6 +61,7 @@ public class UserServiceImpl implements UserService {
                 .verificationCode(UUID.randomUUID().toString())
                 .build();
         user.setStatus(status);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         User saveUser = userRepo.save(user);
 
@@ -59,6 +73,26 @@ public class UserServiceImpl implements UserService {
         emailSend(saveUser, url);
 
         return true;
+    }
+
+    @Override
+    public LoginResponse login(LoginRequest loginRequest) {
+        Authentication authenticate = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+        );
+
+        if (authenticate.isAuthenticated()) {
+            CustomUserDetails customUserDetails = (CustomUserDetails)authenticate.getPrincipal();
+
+            String token = "afa9ba9e-a382-4678-9b3b-962eb0dd9cfb";
+
+            return LoginResponse.builder()
+                    .user(mapper.map(customUserDetails.getUser(), UserDto.class))
+                    .token(token)
+                    .build();
+        }
+
+        return null;
     }
 
     private void emailSend(User saveUser, String url) throws Exception {
