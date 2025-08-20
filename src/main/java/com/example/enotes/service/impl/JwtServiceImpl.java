@@ -1,8 +1,11 @@
 package com.example.enotes.service.impl;
 
 import com.example.enotes.entity.User;
+import com.example.enotes.exception.JwtTokenExpiredException;
 import com.example.enotes.service.JwtService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -44,7 +47,8 @@ public class JwtServiceImpl implements JwtService {
                 .claims().add(claims)
                 .subject(user.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 60 *10))
+                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 60 * 10))
+                //.expiration(new Date(System.currentTimeMillis() + 60 * 60 * 1))
                 .and()
                 .signWith(getKey())
                 .compact();
@@ -64,15 +68,23 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(decryptKey(secretKey))
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            return Jwts.parser()
+                    .verifyWith(decryptKey(secretKey))
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (ExpiredJwtException e) {
+            throw new JwtTokenExpiredException("Token is expired");
+        } catch (JwtException e) {
+            throw new JwtTokenExpiredException("JWT token is invalid");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private SecretKey decryptKey(String secretKey) {
-        byte[] keyBytes = Decoders.BASE64URL.decode(secretKey);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
 
         return Keys.hmacShaKeyFor(keyBytes);
     }
