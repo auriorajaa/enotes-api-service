@@ -6,6 +6,7 @@ import com.example.enotes.enums.TodoStatus;
 import com.example.enotes.exception.ResourceNotFoundException;
 import com.example.enotes.repository.TodoRepository;
 import com.example.enotes.service.TodoService;
+import com.example.enotes.util.CommonUtil;
 import com.example.enotes.util.Validation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +43,8 @@ public class TodoServiceImpl implements TodoService {
         return false;
     }
 
-    @Override
-    public TodoDto getTodoById(Integer id) throws Exception{
-        Todo todo = todoRepo.findById(id)
+    public TodoDto getTodoByIdAndUser(Integer todoId, Integer userId) throws Exception {
+        Todo todo = todoRepo.findByIdAndCreatedBy(todoId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Todo not found"));
 
         TodoDto todoDto = mapper.map(todo, TodoDto.class);
@@ -68,7 +68,7 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public List<TodoDto> getTodoByUser() {
-        Integer userId = 2;
+        Integer userId = CommonUtil.getLoggedInUser().getId();
 
         List<Todo> todos = todoRepo.findByCreatedBy(userId);
 

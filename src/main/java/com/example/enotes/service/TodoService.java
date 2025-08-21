@@ -8,7 +8,7 @@ public interface TodoService {
 
     public Boolean saveTodo(TodoDto todo) throws Exception;
 
-    public TodoDto getTodoById(Integer id) throws Exception;
+    public TodoDto getTodoByIdAndUser(Integer todoId, Integer userId) throws Exception;
 
     public List<TodoDto> getTodoByUser();
 }

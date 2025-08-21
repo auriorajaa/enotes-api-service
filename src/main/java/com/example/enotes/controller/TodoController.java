@@ -35,7 +35,9 @@ public class TodoController {
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getTodoById(@PathVariable Integer id) throws Exception {
-        TodoDto todo = todoService.getTodoById(id);
+        Integer userId = CommonUtil.getLoggedInUser().getId();
+
+        TodoDto todo = todoService.getTodoByIdAndUser(id, userId);
 
         return CommonUtil.createBuildResponse(todo, HttpStatus.OK);
     }
