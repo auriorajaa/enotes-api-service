@@ -17,8 +17,10 @@ import com.example.enotes.dto.FavoriteNotesDto;
 import com.example.enotes.dto.NotesResponse;
 import com.example.enotes.entity.FavoriteNotes;
 import com.example.enotes.entity.FileDetails;
+import com.example.enotes.entity.User;
 import com.example.enotes.repository.FavoriteNotesRepository;
 import com.example.enotes.repository.FileRepository;
+import com.example.enotes.util.CommonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
@@ -194,7 +196,9 @@ public class NotesServiceImpl implements NotesService {
   }
 
   @Override
-  public NotesResponse getAllNotesByUser(Integer userId, Integer pageNo, Integer pageSize) {
+  public NotesResponse getAllNotesByUser(Integer pageNo, Integer pageSize) {
+
+    Integer userId = CommonUtil.getLoggedInUser().getId();
 
     Pageable pageable = PageRequest.of(pageNo,pageSize);
     Page<Notes> pageNotes = notesRepo.findByCreatedByAndIsDeletedFalse(userId, pageable);
@@ -235,7 +239,8 @@ public class NotesServiceImpl implements NotesService {
   }
 
   @Override
-  public List<NotesDto> getUserRecycleBinNotes(Integer userId) {
+  public List<NotesDto> getUserRecycleBinNotes() {
+    Integer userId = CommonUtil.getLoggedInUser().getId();
     List<Notes> recycleNotes = notesRepo.findByCreatedByAndIsDeletedTrue(userId);
     List<NotesDto> notesDtoList = recycleNotes.stream().map(notes -> mapper.map(notes, NotesDto.class)).toList();
 
@@ -255,7 +260,9 @@ public class NotesServiceImpl implements NotesService {
   }
 
   @Override
-  public void emptyRecycleBin(int userId) {
+  public void emptyRecycleBin() {
+    Integer userId = CommonUtil.getLoggedInUser().getId();
+
     List<Notes> recycleNotes = notesRepo.findByCreatedByAndIsDeletedTrue(userId);
 
     if (!CollectionUtils.isEmpty(recycleNotes)) {
@@ -265,7 +272,7 @@ public class NotesServiceImpl implements NotesService {
 
   @Override
   public void favoriteNotes(Integer notesId) throws Exception{
-    int userId = 2;
+    Integer userId = CommonUtil.getLoggedInUser().getId();
 
     Notes notes = notesRepo.findById(notesId)
             .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
@@ -288,7 +295,7 @@ public class NotesServiceImpl implements NotesService {
 
   @Override
   public List<FavoriteNotesDto> getUserFavoriteNotes() throws Exception {
-    int userId = 2;
+      Integer userId = CommonUtil.getLoggedInUser().getId();
 
     List<FavoriteNotes> favoriteNotes = favoriteNotesRepo.findByUserId(userId);
 

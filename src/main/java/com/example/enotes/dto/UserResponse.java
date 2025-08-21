@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class UserDto {
+public class UserResponse {
 
     private Integer id;
 
@@ -19,11 +19,11 @@ public class UserDto {
 
     private String email;
 
-    private String password;
-
     private String mobNo;
 
-    private List<RoleDto> roles;
+    private StatusDto status;
+
+    private List<UserRequest.RoleDto> roles;
 
     @AllArgsConstructor
     @NoArgsConstructor
@@ -33,5 +33,15 @@ public class UserDto {
     public static class RoleDto {
         private Integer id;
         private String name;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    @Builder
+    public static class StatusDto {
+        private Integer id;
+        private Boolean isActive;
     }
 }

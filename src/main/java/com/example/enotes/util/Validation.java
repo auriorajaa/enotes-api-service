@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.enotes.dto.TodoDto;
-import com.example.enotes.dto.UserDto;
+import com.example.enotes.dto.UserRequest;
 import com.example.enotes.enums.TodoStatus;
 import com.example.enotes.exception.ExistDataException;
 import com.example.enotes.exception.ResourceNotFoundException;
@@ -87,38 +87,38 @@ public class Validation {
 		}
 	}
 
-	public void userValidation(UserDto userDto) {
-		if (!StringUtils.hasText(userDto.getFirstName())) {
+	public void userValidation(UserRequest userRequest) {
+		if (!StringUtils.hasText(userRequest.getFirstName())) {
 			throw new IllegalArgumentException("First name must not be blank.");
 		}
 
-		if (!StringUtils.hasText(userDto.getLastName())) {
+		if (!StringUtils.hasText(userRequest.getLastName())) {
 			throw new IllegalArgumentException("Last name must not be blank.");
 		}
 
-		if (!StringUtils.hasText(userDto.getEmail()) ||
-				!userDto.getEmail().matches(Constants.EMAIL_REGEX)) {
+		if (!StringUtils.hasText(userRequest.getEmail()) ||
+				!userRequest.getEmail().matches(Constants.EMAIL_REGEX)) {
 			throw new IllegalArgumentException("Invalid email address");
 		} else {
 			// Validate email already exist
-			Boolean existEmail = userRepo.existsByEmail(userDto.getEmail());
+			Boolean existEmail = userRepo.existsByEmail(userRequest.getEmail());
 
 			if (existEmail) {
 				throw new ExistDataException("Email already exist");
 			}
 		}
 
-		if (!StringUtils.hasText(userDto.getPassword()) ||
-				!userDto.getPassword().matches(Constants.PASSWORD_REGEX)) {
+		if (!StringUtils.hasText(userRequest.getPassword()) ||
+				!userRequest.getPassword().matches(Constants.PASSWORD_REGEX)) {
 			throw new IllegalArgumentException("Password must be at least 8 characters and include uppercase, lowercase, number, and special character.");
 		}
 
-		if (!StringUtils.hasText(userDto.getMobNo()) ||
-				!userDto.getMobNo().matches(Constants.MOB_NO_REGEX)) {
+		if (!StringUtils.hasText(userRequest.getMobNo()) ||
+				!userRequest.getMobNo().matches(Constants.MOB_NO_REGEX)) {
 			throw new IllegalArgumentException("Invalid mobile number. Format must include country code. Example: +14155552671 (US).");
 		}
 
-		if (CollectionUtils.isEmpty(userDto.getRoles())) {
+		if (CollectionUtils.isEmpty(userRequest.getRoles())) {
 			throw new IllegalArgumentException("Roles must not be blank.");
 		} else {
 			List<Integer> roleIds = roleRepo
@@ -127,7 +127,7 @@ public class Validation {
 					.map(r -> r.getId())
 					.toList();
 
-			List<Integer> invalidReqRoleIds = userDto
+			List<Integer> invalidReqRoleIds = userRequest
 					.getRoles()
 					.stream()
 					.map(r -> r.getId())
