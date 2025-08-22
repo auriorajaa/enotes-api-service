@@ -1,5 +1,13 @@
 package com.example.enotes.service.impl;
 
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
+
 import com.example.enotes.dto.EmailRequest;
 import com.example.enotes.dto.PasswordChangeRequest;
 import com.example.enotes.dto.PasswordResetRequest;
@@ -8,15 +16,11 @@ import com.example.enotes.exception.ResourceNotFoundException;
 import com.example.enotes.repository.UserRepository;
 import com.example.enotes.service.UserService;
 import com.example.enotes.util.CommonUtil;
+
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.UUID;
-
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -85,19 +89,20 @@ public class UserServiceImpl implements UserService {
 
             // token sudah tidak berlaku / hilang
             if (!StringUtils.hasText(existToken)) {
-                throw new IllegalArgumentException("No active password reset token found. Please request a new reset link.");
+                throw new IllegalArgumentException(
+                        "No active password reset token found. Please request a new reset link.");
             }
 
             // token tidak cocok
             if (!existToken.equals(reqToken)) {
-                throw new IllegalArgumentException("Invalid or expired password reset token. Please request a new reset link.");
+                throw new IllegalArgumentException(
+                        "Invalid or expired password reset token. Please request a new reset link.");
             }
 
         } else {
             throw new IllegalArgumentException("Password reset token is required.");
         }
     }
-
 
     private void sendEmailRequest(User user, String url) throws Exception {
         String message = ""
@@ -115,8 +120,7 @@ public class UserServiceImpl implements UserService {
                 url + "/api/v1/home/verify-password-link?uid="
                         + user.getId()
                         + "&code="
-                        + user.getStatus().getPasswordResetToken()
-        );
+                        + user.getStatus().getPasswordResetToken());
 
         EmailRequest emailRequest = EmailRequest.builder()
                 .to(user.getEmail())

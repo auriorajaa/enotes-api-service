@@ -5,12 +5,14 @@ import com.example.enotes.dto.UserResponse;
 import com.example.enotes.entity.User;
 import com.example.enotes.service.UserService;
 import com.example.enotes.util.CommonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/user")
 public class UserController {

@@ -17,6 +17,9 @@ import com.example.enotes.repository.CategoryRepository;
 import com.example.enotes.service.CategoryService;
 import com.example.enotes.util.Validation;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
@@ -48,7 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 		if (ObjectUtils.isEmpty(category.getId())) {
 			category.setIsDeleted(false);
-//			category.setCreatedBy(1);
+			// category.setCreatedBy(1);
 		} else {
 			updateCategory(category);
 		}
@@ -71,8 +74,8 @@ public class CategoryServiceImpl implements CategoryService {
 			category.setCreatedOn(existCategory.getCreatedOn());
 			category.setIsDeleted(existCategory.getIsDeleted());
 
-//			category.setUpdatedBy(1);
-//			category.setUpdatedOn(new Date());
+			// category.setUpdatedBy(1);
+			// category.setUpdatedOn(new Date());
 		}
 	}
 

@@ -6,6 +6,7 @@ import com.example.enotes.dto.UserRequest;
 import com.example.enotes.service.AuthService;
 import com.example.enotes.util.CommonUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
@@ -24,15 +26,15 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserRequest userRequest, HttpServletRequest request) throws Exception {
-       String url = CommonUtil.getUrl(request);
+        String url = CommonUtil.getUrl(request);
 
         Boolean register = authService.register(userRequest, url);
 
-        if (register) {
-            return CommonUtil.createBuildResponseMessage("User registered successfully", HttpStatus.CREATED);
+        if (!register) {
+            return CommonUtil.createErrorResponseMessage("User registration failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return CommonUtil.createErrorResponseMessage("User registration failed", HttpStatus.INTERNAL_SERVER_ERROR);
+        return CommonUtil.createBuildResponseMessage("User registered successfully", HttpStatus.CREATED);
     }
 
     @PostMapping("/login")

@@ -19,77 +19,108 @@ import java.nio.file.AccessDeniedException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<?> handleException(Exception e) {
-		log.error("GlobalExceptionHandler :: handleException :: ", e.getMessage());
-
-		return CommonUtil.createErrorResponseMessage(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleGenericException(Exception e) {
+        log.error("Unhandled exception occurred", e);
+        return CommonUtil.createErrorResponseMessage(
+                "An unexpected error occurred. Please contact support if the issue persists.",
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
+    }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e) {
-        log.error("GlobalExceptionHandler :: handleAccessDeniedException :: ", e.getMessage());
-
-        return CommonUtil.createErrorResponseMessage(e.getMessage(), HttpStatus.FORBIDDEN);
+        log.warn("Access denied: {}", e.getMessage());
+        return CommonUtil.createErrorResponseMessage(
+                "You do not have permission to access this resource.",
+                HttpStatus.FORBIDDEN
+        );
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<?> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
-        log.error("GlobalExceptionHandler :: handleAuthorizationDeniedException :: ", e.getMessage());
-
-        return CommonUtil.createErrorResponseMessage(e.getMessage(), HttpStatus.FORBIDDEN);
+        log.warn("Authorization denied: {}", e.getMessage());
+        return CommonUtil.createErrorResponseMessage(
+                "You are not authorized to perform this action.",
+                HttpStatus.FORBIDDEN
+        );
     }
 
     @ExceptionHandler(SuccessException.class)
     public ResponseEntity<?> handleSuccessException(SuccessException e) {
-        log.error("GlobalExceptionHandler :: handleSuccessException :: ", e.getMessage());
-
+        log.info("Success: {}", e.getMessage());
         return CommonUtil.createErrorResponseMessage(e.getMessage(), HttpStatus.OK);
     }
 
-	@ExceptionHandler(IllegalArgumentException.class)
-	public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
-		log.error("GlobalExceptionHandler :: handleIllegalArgumentException ::", e.getMessage());
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error("Invalid argument: {}", e.getMessage(), e);
+        return CommonUtil.createErrorResponseMessage(
+                "Invalid input provided. Please check your request.",
+                HttpStatus.BAD_REQUEST
+        );
+    }
 
-		return CommonUtil.createErrorResponseMessage(e.getMessage(), HttpStatus.BAD_REQUEST);
-	}
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<?> handleNullPointerException(NullPointerException e) {
+        log.error("Null pointer exception occurred", e);
+        return CommonUtil.createErrorResponseMessage(
+                "A required value was missing. Please contact support if the issue persists.",
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
+    }
 
-	@ExceptionHandler(NullPointerException.class)
-	public ResponseEntity<?> handleNullPointerException(Exception e) {
-		log.error("GlobalExceptionHandler :: handleNullPointerException :: ", e.getMessage());
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException e) {
+        log.warn("Resource not found: {}", e.getMessage());
+        return CommonUtil.createErrorResponseMessage(
+                e.getMessage(),
+                HttpStatus.NOT_FOUND
+        );
+    }
 
-		return CommonUtil.createErrorResponseMessage(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<?> handleValidationException(ValidationException e) {
+        log.error("Validation failed: {}", e.getMessage(), e);
+        return CommonUtil.createErrorResponse(
+                e.getErrors(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
 
-	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<?> handleResourceNotFoundException(Exception e) {
-		log.error("GlobalExceptionHandler :: handleResourceNotFoundException :: ", e.getMessage());
+    @ExceptionHandler(ExistDataException.class)
+    public ResponseEntity<?> handleExistDataException(ExistDataException e) {
+        log.warn("Data conflict: {}", e.getMessage());
+        return CommonUtil.createErrorResponseMessage(
+                e.getMessage(),
+                HttpStatus.CONFLICT
+        );
+    }
 
-		return CommonUtil.createErrorResponseMessage(e.getMessage(), HttpStatus.NOT_FOUND);
-	}
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.error("Malformed JSON request: {}", e.getMessage(), e);
+        return CommonUtil.createErrorResponseMessage(
+                "Malformed request. Please check your input format.",
+                HttpStatus.BAD_REQUEST
+        );
+    }
 
-	@ExceptionHandler(ValidationException.class)
-	public ResponseEntity<?> handleValidationException(ValidationException e) {
-		return CommonUtil.createErrorResponse(e.getErrors(), HttpStatus.BAD_REQUEST);
-	}
-
-	@ExceptionHandler(ExistDataException.class)
-	public ResponseEntity<?> handleExistDataException(ExistDataException e) {
-		return CommonUtil.createErrorResponseMessage(e.getMessage(), HttpStatus.CONFLICT);
-	}
-
-	@ExceptionHandler(HttpMessageNotReadableException.class)
-	public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-		return CommonUtil.createErrorResponseMessage(e.getMessage(), HttpStatus.BAD_REQUEST);
-	}
-
-	@ExceptionHandler(FileNotFoundException.class)
-	public ResponseEntity<?> handleFileNotFoundException(FileNotFoundException e) {
-		return CommonUtil.createErrorResponseMessage(e.getMessage(), HttpStatus.NOT_FOUND);
-	}
+    @ExceptionHandler(FileNotFoundException.class)
+    public ResponseEntity<?> handleFileNotFoundException(FileNotFoundException e) {
+        log.warn("File not found: {}", e.getMessage());
+        return CommonUtil.createErrorResponseMessage(
+                "Requested file could not be found.",
+                HttpStatus.NOT_FOUND
+        );
+    }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException e) {
-        return CommonUtil.createErrorResponseMessage(e.getMessage(), HttpStatus.BAD_REQUEST);
+        log.warn("Bad credentials: {}", e.getMessage());
+        return CommonUtil.createErrorResponseMessage(
+                "Invalid username or password.",
+                HttpStatus.BAD_REQUEST
+        );
     }
 }
