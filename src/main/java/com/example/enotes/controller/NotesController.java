@@ -79,6 +79,16 @@ public class NotesController {
     return CommonUtil.createBuildResponse(notes, HttpStatus.OK);
   }
 
+  @GetMapping("/search")
+  @PreAuthorize("hasRole('USER')")
+  public ResponseEntity<?> searchNotes(@RequestParam(name = "key", defaultValue = "") String key,
+                                       @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+                                       @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+      NotesResponse notes = notesService.getAllNotesByUserSearch(pageNo, pageSize, key);
+
+      return CommonUtil.createBuildResponse(notes, HttpStatus.OK);
+  }
+
   @GetMapping("/delete/{id}")
   @PreAuthorize("hasRole('USER')")
   public ResponseEntity<?> deleteNotes(@PathVariable Integer id) throws Exception {
