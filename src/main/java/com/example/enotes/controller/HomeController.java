@@ -5,11 +5,14 @@ import com.example.enotes.service.HomeService;
 import com.example.enotes.service.UserService;
 import com.example.enotes.util.CommonUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/home")
 public class HomeController {

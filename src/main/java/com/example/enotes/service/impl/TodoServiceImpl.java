@@ -1,5 +1,12 @@
 package com.example.enotes.service.impl;
 
+import java.util.List;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+
 import com.example.enotes.dto.TodoDto;
 import com.example.enotes.entity.Todo;
 import com.example.enotes.enums.TodoStatus;
@@ -8,13 +15,10 @@ import com.example.enotes.repository.TodoRepository;
 import com.example.enotes.service.TodoService;
 import com.example.enotes.util.CommonUtil;
 import com.example.enotes.util.Validation;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class TodoServiceImpl implements TodoService {
 
@@ -28,7 +32,7 @@ public class TodoServiceImpl implements TodoService {
     private Validation validation;
 
     @Override
-    public Boolean saveTodo(TodoDto todoDto) throws Exception{
+    public Boolean saveTodo(TodoDto todoDto) throws Exception {
         // Validation to do list status
         validation.todoValidation(todoDto);
 

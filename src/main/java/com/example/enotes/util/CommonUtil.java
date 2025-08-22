@@ -1,16 +1,15 @@
 package com.example.enotes.util;
 
-import com.example.enotes.config.security.CustomUserDetails;
-import com.example.enotes.dto.UserResponse;
-import com.example.enotes.entity.User;
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-
-import com.example.enotes.handler.GenericResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.example.enotes.config.security.CustomUserDetails;
+import com.example.enotes.entity.User;
+import com.example.enotes.handler.GenericResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class CommonUtil {
 

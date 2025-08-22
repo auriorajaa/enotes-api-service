@@ -6,22 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import com.example.enotes.dto.FavoriteNotesDto;
-import com.example.enotes.dto.NotesResponse;
-import com.example.enotes.entity.FavoriteNotes;
-import com.example.enotes.entity.FileDetails;
-import com.example.enotes.entity.User;
-import com.example.enotes.repository.FavoriteNotesRepository;
-import com.example.enotes.repository.FileRepository;
-import com.example.enotes.util.CommonUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +21,27 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-
-import com.example.enotes.dto.CategoryDto;
-import com.example.enotes.dto.NotesDto;
-import com.example.enotes.entity.Notes;
-import com.example.enotes.exception.ResourceNotFoundException;
-import com.example.enotes.repository.CategoryRepository;
-import com.example.enotes.repository.NotesRepository;
-import com.example.enotes.service.NotesService;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.enotes.dto.FavoriteNotesDto;
+import com.example.enotes.dto.NotesDto;
+import com.example.enotes.dto.NotesResponse;
+import com.example.enotes.entity.FavoriteNotes;
+import com.example.enotes.entity.FileDetails;
+import com.example.enotes.entity.Notes;
+import com.example.enotes.exception.ResourceNotFoundException;
+import com.example.enotes.repository.CategoryRepository;
+import com.example.enotes.repository.FavoriteNotesRepository;
+import com.example.enotes.repository.FileRepository;
+import com.example.enotes.repository.NotesRepository;
+import com.example.enotes.service.NotesService;
+import com.example.enotes.util.CommonUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class NotesServiceImpl implements NotesService {
 
@@ -103,7 +102,7 @@ public class NotesServiceImpl implements NotesService {
 
   private void updateNotes(NotesDto notesDto, MultipartFile file) throws Exception {
     Notes existNotes = notesRepo.findById(notesDto.getId())
-            .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
 
     // Update notes if user not choosing any attachment file
     if (ObjectUtils.isEmpty(file)) {
@@ -119,7 +118,8 @@ public class NotesServiceImpl implements NotesService {
 
       List<String> extensionAllow = Arrays.asList("pdf", "png", "jpg", "jpeg", "xlsx", "docx");
       if (!extensionAllow.contains(extension)) {
-        throw new IllegalArgumentException("File extension are not allowed (Only .pdf, .png, .jpg, .jpeg, .xlsx, .docx are allowed)");
+        throw new IllegalArgumentException(
+            "File extension are not allowed (Only .pdf, .png, .jpg, .jpeg, .xlsx, .docx are allowed)");
       }
 
       String rndString = UUID.randomUUID().toString();
@@ -200,49 +200,50 @@ public class NotesServiceImpl implements NotesService {
 
     Integer userId = CommonUtil.getLoggedInUser().getId();
 
-    Pageable pageable = PageRequest.of(pageNo,pageSize);
+    Pageable pageable = PageRequest.of(pageNo, pageSize);
     Page<Notes> pageNotes = notesRepo.findByCreatedByAndIsDeletedFalse(userId, pageable);
 
     List<NotesDto> notesDto = pageNotes.get().map(n -> mapper.map(n, NotesDto.class)).toList();
 
     NotesResponse notes = NotesResponse.builder()
-            .notes(notesDto)
-            .pageNo(pageNotes.getNumber())
-            .pageSize(pageNotes.getSize())
-            .totalElements(pageNotes.getTotalElements())
-            .totalPages(pageNotes.getTotalPages())
-            .isFirst(pageNotes.isFirst())
-            .isLast(pageNotes.isLast())
-            .build();
+        .notes(notesDto)
+        .pageNo(pageNotes.getNumber())
+        .pageSize(pageNotes.getSize())
+        .totalElements(pageNotes.getTotalElements())
+        .totalPages(pageNotes.getTotalPages())
+        .isFirst(pageNotes.isFirst())
+        .isLast(pageNotes.isLast())
+        .build();
 
     return notes;
   }
 
-    @Override
-    public NotesResponse getAllNotesByUserSearch(Integer pageNo, Integer pageSize, String keyword) {
-        Integer userId = CommonUtil.getLoggedInUser().getId();
+  @Override
+  public NotesResponse getAllNotesByUserSearch(Integer pageNo, Integer pageSize, String keyword) {
+    Integer userId = CommonUtil.getLoggedInUser().getId();
 
-        Pageable pageable = PageRequest.of(pageNo,pageSize);
-        Page<Notes> pageNotes = notesRepo.searchNotes(keyword, userId, pageable);
+    Pageable pageable = PageRequest.of(pageNo, pageSize);
+    Page<Notes> pageNotes = notesRepo.searchNotes(keyword, userId, pageable);
 
-        List<NotesDto> notesDto = pageNotes.get().map(n -> mapper.map(n, NotesDto.class)).toList();
+    List<NotesDto> notesDto = pageNotes.get().map(n -> mapper.map(n, NotesDto.class)).toList();
 
-        NotesResponse notes = NotesResponse.builder()
-                .notes(notesDto)
-                .pageNo(pageNotes.getNumber())
-                .pageSize(pageNotes.getSize())
-                .totalElements(pageNotes.getTotalElements())
-                .totalPages(pageNotes.getTotalPages())
-                .isFirst(pageNotes.isFirst())
-                .isLast(pageNotes.isLast())
-                .build();
+    NotesResponse notes = NotesResponse.builder()
+        .notes(notesDto)
+        .pageNo(pageNotes.getNumber())
+        .pageSize(pageNotes.getSize())
+        .totalElements(pageNotes.getTotalElements())
+        .totalPages(pageNotes.getTotalPages())
+        .isFirst(pageNotes.isFirst())
+        .isLast(pageNotes.isLast())
+        .build();
 
-        return notes;    }
+    return notes;
+  }
 
-    @Override
+  @Override
   public void softDeleteNotes(Integer id) throws Exception {
     Notes notes = notesRepo.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
 
     notes.setDeleted(true);
     notes.setDeletedOn(LocalDateTime.now());
@@ -252,7 +253,7 @@ public class NotesServiceImpl implements NotesService {
   @Override
   public void restoreNotes(Integer id) throws Exception {
     Notes notes = notesRepo.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
 
     notes.setDeleted(false);
     notes.setDeletedOn(null);
@@ -271,7 +272,7 @@ public class NotesServiceImpl implements NotesService {
   @Override
   public void hardDeleteNotes(Integer id) throws Exception {
     Notes notes = notesRepo.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
 
     if (notes.isDeleted()) {
       notesRepo.delete(notes);
@@ -292,31 +293,31 @@ public class NotesServiceImpl implements NotesService {
   }
 
   @Override
-  public void favoriteNotes(Integer notesId) throws Exception{
+  public void favoriteNotes(Integer notesId) throws Exception {
     Integer userId = CommonUtil.getLoggedInUser().getId();
 
     Notes notes = notesRepo.findById(notesId)
-            .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
 
     FavoriteNotes favoriteNotes = FavoriteNotes.builder()
-            .notes(notes)
-            .userId(userId)
-            .build();
+        .notes(notes)
+        .userId(userId)
+        .build();
 
     favoriteNotesRepo.save(favoriteNotes);
   }
 
   @Override
-  public void unFavoriteNotes(Integer favoriteNotesId) throws Exception{
+  public void unFavoriteNotes(Integer favoriteNotesId) throws Exception {
     FavoriteNotes favoriteNotes = favoriteNotesRepo.findById(favoriteNotesId)
-            .orElseThrow(() -> new ResourceNotFoundException("Favorite notes not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Favorite notes not found"));
 
     favoriteNotesRepo.delete(favoriteNotes);
   }
 
   @Override
   public List<FavoriteNotesDto> getUserFavoriteNotes() throws Exception {
-      Integer userId = CommonUtil.getLoggedInUser().getId();
+    Integer userId = CommonUtil.getLoggedInUser().getId();
 
     List<FavoriteNotes> favoriteNotes = favoriteNotesRepo.findByUserId(userId);
 
@@ -326,24 +327,24 @@ public class NotesServiceImpl implements NotesService {
   @Override
   public Boolean copyNotes(Integer id) throws Exception {
     Notes notes = notesRepo.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Notes not found"));
 
-   Notes copyNotes = Notes.builder()
-           .title(notes.getTitle())
-           .description(notes.getDescription())
-           .category(notes.getCategory())
-           .isDeleted(false)
-           .fileDetails(null)
-           .build();
+    Notes copyNotes = Notes.builder()
+        .title(notes.getTitle())
+        .description(notes.getDescription())
+        .category(notes.getCategory())
+        .isDeleted(false)
+        .fileDetails(null)
+        .build();
 
-   // TODO: Need to check user validation
-   Notes saveCopyNotes = notesRepo.save(copyNotes);
+    // TODO: Need to check user validation
+    Notes saveCopyNotes = notesRepo.save(copyNotes);
 
-   if (!ObjectUtils.isEmpty(saveCopyNotes)) {
-     return true;
-   }
+    if (!ObjectUtils.isEmpty(saveCopyNotes)) {
+      return true;
+    }
 
-   return false;
+    return false;
   }
 
 }
