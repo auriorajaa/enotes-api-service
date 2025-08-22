@@ -1,15 +1,8 @@
 package com.example.enotes.service.impl;
 
-import com.example.enotes.config.security.CustomUserDetails;
-import com.example.enotes.dto.*;
-import com.example.enotes.entity.AccountStatus;
-import com.example.enotes.entity.Role;
-import com.example.enotes.entity.User;
-import com.example.enotes.repository.RoleRepository;
-import com.example.enotes.repository.UserRepository;
-import com.example.enotes.service.JwtService;
-import com.example.enotes.service.AuthService;
-import com.example.enotes.util.Validation;
+import java.util.List;
+import java.util.UUID;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,9 +12,24 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.util.List;
-import java.util.UUID;
+import com.example.enotes.config.security.CustomUserDetails;
+import com.example.enotes.dto.EmailRequest;
+import com.example.enotes.dto.LoginRequest;
+import com.example.enotes.dto.LoginResponse;
+import com.example.enotes.dto.UserRequest;
+import com.example.enotes.dto.UserResponse;
+import com.example.enotes.entity.AccountStatus;
+import com.example.enotes.entity.Role;
+import com.example.enotes.entity.User;
+import com.example.enotes.repository.RoleRepository;
+import com.example.enotes.repository.UserRepository;
+import com.example.enotes.service.AuthService;
+import com.example.enotes.service.JwtService;
+import com.example.enotes.util.Validation;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
 

@@ -5,6 +5,7 @@ import java.util.List;
 import com.example.enotes.dto.FavoriteNotesDto;
 import com.example.enotes.dto.NotesResponse;
 import com.example.enotes.entity.FileDetails;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import com.example.enotes.service.NotesService;
 import com.example.enotes.util.CommonUtil;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/notes")
 public class NotesController {
