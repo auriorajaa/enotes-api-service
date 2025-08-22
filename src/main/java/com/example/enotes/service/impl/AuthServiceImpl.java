@@ -71,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // Send email
-        emailSend(saveUser, url);
+        emailSendForRegister(saveUser, url);
 
         return true;
     }
@@ -96,7 +96,7 @@ public class AuthServiceImpl implements AuthService {
         return null;
     }
 
-    private void emailSend(User saveUser, String url) throws Exception {
+    private void emailSendForRegister(User saveUser, String url) throws Exception {
         String message = ""
                 + "Dear [[username]],"
                 + "<br><br>Thank you for registering with Enotes. "
