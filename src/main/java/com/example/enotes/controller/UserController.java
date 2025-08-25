@@ -2,6 +2,7 @@ package com.example.enotes.controller;
 
 import com.example.enotes.dto.PasswordChangeRequest;
 import com.example.enotes.dto.UserResponse;
+import com.example.enotes.endpoint.UserEndpoint;
 import com.example.enotes.entity.User;
 import com.example.enotes.service.UserService;
 import com.example.enotes.util.CommonUtil;
@@ -14,8 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/user")
-public class UserController {
+public class UserController implements UserEndpoint {
 
     @Autowired
     private ModelMapper mapper;
@@ -23,7 +23,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/profile")
+    @Override
     public ResponseEntity<?> getProfile() {
         User loggedInUser = CommonUtil.getLoggedInUser();
         UserResponse userResponse = mapper.map(loggedInUser, UserResponse.class);
@@ -31,7 +31,7 @@ public class UserController {
         return CommonUtil.createBuildResponse(userResponse, HttpStatus.OK);
     }
 
-    @PostMapping("/change-password")
+    @Override
     public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequest passwordChangeRequest) {
         userService.changePassword(passwordChangeRequest);
 
