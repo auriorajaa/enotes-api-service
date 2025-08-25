@@ -28,7 +28,7 @@ public class CategoryController implements CategoryEndpoint {
 	private CategoryService categoryService;
 
     @Override
-	public ResponseEntity<?> saveCategory(@RequestBody CategoryDto categoryDto) {
+	public ResponseEntity<?> saveCategory(CategoryDto categoryDto) {
 
 		Boolean saveCategory = categoryService.saveCategory(categoryDto);
 
@@ -65,7 +65,7 @@ public class CategoryController implements CategoryEndpoint {
 	}
 
     @Override
-    public ResponseEntity<?> getCategoryDetailsById(@PathVariable Integer id) throws Exception {
+    public ResponseEntity<?> getCategoryDetailsById(Integer id) throws Exception {
 
 		CategoryDto categoryDto = categoryService.getCategoryById(id);
 
@@ -77,7 +77,7 @@ public class CategoryController implements CategoryEndpoint {
 	}
 
     @Override
-    public ResponseEntity<?> deleteCategoryById(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteCategoryById(Integer id) {
 
 		Boolean deleted = categoryService.deleteCategory(id);
 
