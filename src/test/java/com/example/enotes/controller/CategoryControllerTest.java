@@ -1,0 +1,82 @@
+package com.example.enotes.controller;
+
+import com.example.enotes.dto.CategoryDto;
+import com.example.enotes.entity.Category;
+import com.example.enotes.service.CategoryService;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+public class CategoryControllerTest {
+
+    @Mock
+    private CategoryService categoryService;
+
+    @InjectMocks
+    private CategoryController categoryController;
+
+    private CategoryDto categoryDto = null;
+
+    private Category category = null;
+
+    private List<Category> categories = new ArrayList<>();
+
+    private List<CategoryDto> categoriesDto = new ArrayList<>();
+
+    @BeforeEach
+    public void initialize() {
+        categoryDto = CategoryDto.builder()
+                .id(null)
+                .name("Category from testing")
+                .description("Description from testing")
+                .isActive(true)
+                .build();
+
+        category = Category.builder()
+                .id(null)
+                .name("Category from testing")
+                .description("Description from testing")
+                .isActive(true)
+                .isDeleted(false)
+                .build();
+
+        categories.add(category);
+        categoriesDto.add(categoryDto);
+    }
+
+    @Test
+    public void testSaveCategory() {
+        when(categoryService.saveCategory(categoryDto)).thenReturn(true);
+        ResponseEntity<?> response = categoryController.saveCategory(categoryDto);
+        Object body = response.getBody();
+        Map<String, String> json = (Map<String, String>) body;
+
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.CREATED);
+        Assertions.assertEquals(json.get("status"), "success");
+    }
+
+    @Test
+    public void testCategoryNotSaved() {
+        when(categoryService.saveCategory(categoryDto)).thenReturn(false);
+        ResponseEntity<?> response = categoryController.saveCategory(categoryDto);
+        Object body = response.getBody();
+        Map<String, String> json = (Map<String, String>) body;
+
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+        Assertions.assertEquals(json.get("status"), "failed");
+        Assertions.assertEquals(json.get("message"), "Something went wrong when saving category. Failed to save.");
+    }
+}
